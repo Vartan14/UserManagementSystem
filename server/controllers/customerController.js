@@ -9,12 +9,35 @@ const {locals} = require("express/lib/application");
 
 exports.homepage = async  (req, res) => {
 
+    const messages = await req.flash("info");
+
     const locals = {
         title: 'User Management',
         description: 'NodeJS User Management System',
     }
 
-    res.render('index', locals);
+    let perPage = 12;
+    let page = req.query.page || 1;
+
+    try {
+        const customers = await Customer.aggregate([{ $sort: { updatedAt: -1 } }])
+            .skip(perPage * page - perPage)
+            .limit(perPage)
+            .exec();
+        
+        const count =  await Customer.countDocuments();
+
+        res.render('index', {
+            locals,
+            customers,
+            current: page,
+            pages: Math.ceil(count / perPage),
+            messages,
+        });
+
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 /**
@@ -49,6 +72,8 @@ exports.postCustomer = async  (req, res) => {
 
     try {
         await Customer.create(newCustomer);
+        await req.flash('info', 'New customer has been created');
+
         res.redirect('/')
 
     } catch(err) {

@@ -9,6 +9,9 @@ const customerController = require('../controllers/customerController');
 // Home
 router.get('/', customerController.homepage);
 
+// About page
+router.get('/about', customerController.about)
+
 // Create new customer
 router.get('/add', customerController.addCustomer);
 router.post('/add', customerController.postCustomer);
@@ -22,6 +25,9 @@ router.put('/edit/:id', customerController.editPostCustomer);
 
 // Delete customer
 router.delete('/edit/:id', customerController.deleteCustomer);
+
+// Search
+router.post('/search', customerController.searchCustomers);
 
 
 module.exports = router;

@@ -41,6 +41,29 @@ exports.homepage = async  (req, res) => {
 }
 
 /**
+ * GET
+ * About
+ */
+
+exports.about = async  (req, res) => {
+
+    const locals = {
+        title: 'About',
+        GitHubRef: 'https://github.com/Vartan14/UserManagementSystem',
+        description: 'NodeJS User Management System',
+    }
+
+    try {
+        res.render('about', {locals})
+    }
+    catch (err) {
+        console.error(err);
+    }
+
+}
+
+
+/**
  * GET /
  * New Customer Form
  */
@@ -150,7 +173,7 @@ exports.editPostCustomer = async (req, res) => {
 };
 
 /**
- * Delete /
+ * DELETE /
  * Delete Customer Data
  */
 exports.deleteCustomer = async (req, res) => {
@@ -160,6 +183,36 @@ exports.deleteCustomer = async (req, res) => {
     res.redirect('/');
 
     console.log("user deleted");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+/**
+ * Get /
+ * Search Customer Data
+ */
+exports.searchCustomers = async (req, res) => {
+  const locals = {
+    title: "Search Customer Data",
+    description: "Free NodeJs User Management System",
+  };
+
+  try {
+    let searchTerm = req.body.searchTerm;
+    const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9 ]/g, "");
+
+    const customers = await Customer.find({
+      $or: [
+        { firstName: { $regex: new RegExp(searchNoSpecialChar, "i") } },
+        { lastName: { $regex: new RegExp(searchNoSpecialChar, "i") } },
+      ],
+    });
+
+    res.render("search", {
+      customers,
+      locals,
+    });
   } catch (error) {
     console.log(error);
   }
